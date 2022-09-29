@@ -1,15 +1,61 @@
 params.results_dir = "results/"
+SRA_file = new File(params.file).readLines()
 params.s = 1
 params.l = 100
 
+log.info "List of files: ${SRA_file}"
 log.info ""
 log.info "  R E A D S  C O U N T  "
 log.info "================================="
+log.info "SRA number         : ${SRA_file}"
+log.info "Results location   : ${params.results_dir}"
 log.info "Index file         : ${params.i}"
-log.info "Infile             : ${params.infile}"
+log.ibfo "Read length        : ${params.l}"
 
 
+process DownloadFastQ {
+  publishDir "${params.results_dir}"
 
+  input:
+    val sra
+
+  output:
+    path "${sra}/*"
+
+  script:
+    """
+    /content/sratoolkit.3.0.0-ubuntu64/bin/fastq-dump --gzip --split-3 ${sra} -O ${sra}/
+    """
+}
+
+process QC {
+  input:
+    path x
+
+  output:
+    path "qc/*"
+
+  script:
+    """
+    mkdir qc
+    /content/FastQC/fastqc -o qc $x
+    """
+}
+
+process MultiQC {
+  publishDir "${params.results_dir}"
+
+  input:
+    path x
+
+  output:
+    path "multiqc_report.html"
+
+  script:
+    """
+    multiqc $x
+    """
+}
 
 process Kallisto {
   publishDir "${params.results_dir}"
@@ -25,10 +71,14 @@ process Kallisto {
 
   script:
     """
-    /content/kallisto/build/src/kallisto quant -l ${params.l} -i $i --single -s ${params.s} -o $params.results_dir $f
+    /content/kallisto/build/src/kallisto quant  -l ${params.l} -s ${params.s} -i $i -o $params.results_dir $f
     """   
 }
 
 workflow {
-  Kallisto( params.i, params.infile, params.s, params.l )
+  data = Channel.fromList( SRA_file )
+  DownloadFastQ(data)
+  QC( DownloadFastQ.out )
+  MultiQC( QC.out.collect() )
+  Kallisto( params.i, DownloadFastQ.out )
 }
