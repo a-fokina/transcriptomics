@@ -10,7 +10,7 @@ log.info "================================="
 log.info "SRA number         : ${SRA_file}"
 log.info "Results location   : ${params.results_dir}"
 log.info "Index file         : ${params.i}"
-log.ibfo "Read length        : ${params.l}"
+log.info "Read length        : ${params.l}"
 
 
 process DownloadFastQ {
