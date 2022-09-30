@@ -71,7 +71,7 @@ process Kallisto {
 
   script:
     """
-    /content/kallisto/build/src/kallisto quant  -l ${params.l} -s ${params.s} -i $i -o $params.results_dir $f
+    /content/kallisto/build/src/kallisto quant  -l ${params.l} -s ${params.s} -i $i -o $params.results_dir $f --single
     """   
 }
 
