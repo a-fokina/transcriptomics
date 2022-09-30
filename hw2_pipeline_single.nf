@@ -80,5 +80,5 @@ workflow {
   DownloadFastQ(data)
   QC( DownloadFastQ.out )
   MultiQC( QC.out.collect() )
-  Kallisto( params.i, DownloadFastQ.out )
+  Kallisto( params.i, DownloadFastQ.out, params.s, params.l )
 }
