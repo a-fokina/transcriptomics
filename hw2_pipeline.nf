@@ -59,14 +59,16 @@ process Kallisto {
 
   input:
     path i
-    path f
+    path x
+
 
   output:
-    path "abundance.tsv"
+    path "kallisto/abundance.tsv"
 
   script:
     """
-    /content/kallisto/build/src/kallisto quant -i $i -o $params.results_dir $f
+    mkdir kallisto
+    /content/kallisto/build/src/kallisto quant -i $i -o kallisto $x
     """   
 }
 
