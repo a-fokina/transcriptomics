@@ -56,6 +56,7 @@ process MultiQC {
 
 process Kallisto {
   publishDir "${params.results_dir}"
+  saveAs: { abundance.tsv -> "$x" }
 
   input:
     path i
